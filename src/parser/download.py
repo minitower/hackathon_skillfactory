@@ -16,7 +16,7 @@ class Downloader:
         '''
         Function for 
         '''
-        out = open(self.path/'data'/'parsed'/'final.tsv', 'w', encoding='utf8')
+        out = open(self.path/'data'/'parsed'/'final.csv', 'w', encoding='utf8')
 
         with open(self.path/'data'/'parsed'/'parsed.tsv', newline='') as csvfile:
             rdr = csv.reader(csvfile, delimiter='\t')
@@ -33,7 +33,7 @@ class Downloader:
                 urllib.request.urlretrieve(url, filename)
                 
                 self.idx += 1
-                out.write(str(filename) + "\t" + row[1] + "\t" + row[2] + "\n")
+                out.write(str(self.idx) + "," + row[1].replace(',', ';') + "," + row[2].replace(',', ';') + "\n")
                 
         out.flush()
         out.close()
