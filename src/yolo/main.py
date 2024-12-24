@@ -26,11 +26,14 @@ def process_image(image_path, mode='crop'):
         try:
             os.mkdir(str(idx_path))
             
-            for box in boxes:
-                x1, y1, x2, y2 = box
-                #cv2.rectangle(image, (x1, y1), (x2, y2), (192, 192, 192), 2)
-                cv2.imwrite(str(idx_path/f'crop_{n}.jpg'), image[y1:y2, x1:x2])
-                n+=1
+            if len(boxes)!=0:
+                for box in boxes:
+                    x1, y1, x2, y2 = box
+                    #cv2.rectangle(image, (x1, y1), (x2, y2), (192, 192, 192), 2)
+                    cv2.imwrite(str(idx_path/f'crop_{n}.jpg'), image[y1:y2, x1:x2])
+                    n+=1
+            else:
+                cv2.imwrite(str(idx_path/f'crop_0.jpg'), image)
         except FileExistsError:
             print('Dir already exist! Scip this image')
     elif mode=='search':
