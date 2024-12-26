@@ -39,7 +39,7 @@ class Autoencoder:
             return np.array(img_arr)
         else:
             img = cv2.imread(image)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # cv2.COLOR_BGR2RGB
             img = cv2.resize(img, (224,224))
             img=img/255
             return img
@@ -47,8 +47,8 @@ class Autoencoder:
     def build_models(self, code_size):
         H,W,C = self.IMG_SHAPE
         # encoder
-        encoder = tf.keras.models.Sequential() # инициализация модели
-        encoder.add(L.InputLayer(self.IMG_SHAPE)) # добавление входного слоя, размер равен размеру изображения
+        encoder = tf.keras.models.Sequential() 
+        encoder.add(L.InputLayer(self.IMG_SHAPE)) 
         encoder.add(L.Conv2D(filters=32, kernel_size=(3, 3), activation='elu', padding='same'))
         encoder.add(L.MaxPooling2D(pool_size=(2, 2)))
         encoder.add(L.Conv2D(filters=64, kernel_size=(3, 3), activation='elu', padding='same'))

@@ -40,13 +40,15 @@ def process_image(image_path, mode='crop'):
         n=0
         test_path = project_path/f'data/test_images/crops/test_{time.time()}'
         print(test_path)
+        crops_pathes = []
         os.mkdir(str(test_path))
         for box in boxes:
             x1, y1, x2, y2 = box
             #cv2.rectangle(image, (x1, y1), (x2, y2), (192, 192, 192), 2)
             cv2.imwrite(str(test_path/f'crop_{n}.jpg'), image[y1:y2, x1:x2])
+            crops_pathes.append(str(test_path/f'crop_{n}.jpg'))
             n+=1
-        return str(test_path/f'crop_{n}.jpg')
+        return crops_pathes
 
 def get_all_crops():
     images_arr = os.listdir(str(images_path))

@@ -18,7 +18,7 @@ class Similar():
     def find_img(self, image_path):
         img = self.autoencoder.preprocess_image(image=image_path)
         code = self.encoder.predict(img[None])
-        return self.k_mean.kneighbors(code, 5)
+        return self.k_mean.kneighbors(code, 1)
         
     def load_autoencoder(self):
         self.encoder = load_model(str(self.model_path/'encoder.keras'))

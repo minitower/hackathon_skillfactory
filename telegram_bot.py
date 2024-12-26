@@ -7,6 +7,10 @@ from telegram import Update
 import pathlib
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from dotenv import load_dotenv
+from src.yolo import process_image
+from src.find_image import Similar
+import pickle
+import sqlite3
 load_dotenv()
 
 # Настройка логирования
@@ -14,11 +18,14 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
-data_path = pathlib.Path(__file__).parent.resolve()/'..'/'..'/'data'
+data_path = pathlib.Path(__file__).parent.resolve()/'data'
+data_path = data_path.resolve()
 
 # Пути к папкам
 source_folder = data_path/"images"
 destination_folder = data_path/"users_images"
+
+con = sqlite3.connect(str(data_path/'description.db'))
 
 # Функция для получения случайного изображения из папки
 def get_random_image():
@@ -43,6 +50,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     with open(image_path, 'rb') as image_file:
         await update.message.reply_photo(photo=image_file)
 
+async def find_image(file_path):
+    crops_pathes = process_image(file_path, mode='search')
+    sim = Similar()
+    _, crop_id =   sim.find_img(crops_pathes[0])
+    crop_id = crop_id[0][0]
+    with open('./src/models/crop_map.pickle', 'rb') as f:
+        crop_map = pickle.load(f)
+    return crop_map[crop_id]
+
+async def get_info_about_image(img_id):
+    cur = con.cursor()
+    name, description = cur.execute(f'SELECT name, description FROM descriptions WHERE id={img_id}').fetchone()
+    return name, description
+    
 # Обработка изображений
 async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Сохраняет полученное изображение в папку."""
@@ -50,7 +71,10 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     file = await photo.get_file()
     file_path = os.path.join(destination_folder, file.file_unique_id + ".jpg")
     await file.download_to_drive(file_path)
-    await update.message.reply_text(f"Изображение сохранено в {file_path}")
+    #await update.message.reply_text(f"Изображение сохранено в {file_path}")
+    id = await find_image(file_path)
+    name, description = await get_info_about_image(id)
+    await update.message.reply_text(f"Это изображение {name}, его автор: {description}")
 
 def main() -> None:
     """Запуск бота."""
