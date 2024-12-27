@@ -5,17 +5,27 @@ import pathlib
 import os
 import time
 
-# Load a model
+# Create var's for pathes
 script_path = pathlib.Path(__file__).parent.resolve()
 project_path = pathlib.Path(__file__).parent.resolve()/'..'
 project_path=project_path.resolve()
 images_path = project_path/'data'/'images'
 images_path = images_path.resolve()
 yolo_path = script_path/'yolo'/'yolo11n-seg.pt'
+
+# Load YOLO model
 model = YOLO(str(yolo_path))
 
 def process_image(image_path, mode='crop'):
-    image = cv2.imread(image_path)
+    '''
+    Function for process image to YOLO model
+    
+    Args:
+        image_path (str): path to image for YOLO
+        mode (str): one of 'crop' or 'search'. If 'crop' then build all crops from images. 
+            Else, getting crop for one image. Default to 'crop' 
+    '''
+    image = cv2.imread(image_path) # read image
     results = model(image)[0]
     image = results.orig_img
     boxes = results.boxes.xyxy.cpu().numpy().astype(np.int32)
@@ -51,6 +61,9 @@ def process_image(image_path, mode='crop'):
         return crops_pathes
 
 def get_all_crops():
+    '''
+    Function for get all crops from images in path
+    '''
     images_arr = os.listdir(str(images_path))
     for image in images_arr:
         process_image(str(images_path/image), 'crop')

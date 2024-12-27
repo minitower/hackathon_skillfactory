@@ -18,7 +18,7 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
-data_path = pathlib.Path(__file__).parent.resolve()/'data'
+data_path = pathlib.Path(__file__).parent.resolve()/'data' # path to data folder
 data_path = data_path.resolve()
 
 # Пути к папкам
@@ -51,6 +51,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await update.message.reply_photo(photo=image_file)
 
 async def find_image(file_path):
+    '''
+    Function for find image from ready dataset
+    
+    Args:
+        file_path (str): path to file from Telegram bot
+    '''
     crops_pathes = process_image(file_path, mode='search')
     sim = Similar()
     _, crop_id =   sim.find_img(crops_pathes[0])
@@ -60,6 +66,12 @@ async def find_image(file_path):
     return crop_map[crop_id]
 
 async def get_info_about_image(img_id):
+    '''
+    Function for get info about image from SQLite database
+    
+    Args:
+        img_id (str): str with image id
+    '''
     cur = con.cursor()
     name, description = cur.execute(f'SELECT name, description FROM descriptions WHERE id={img_id}').fetchone()
     return name, description

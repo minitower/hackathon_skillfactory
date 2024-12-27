@@ -14,30 +14,28 @@ class Downloader:
 
     def download(self):
         '''
-        Function for 
+        Function for download image from parsed file of WikiData
         '''
-        out = open(self.path/'data'/'parsed'/'final.csv', 'w', encoding='utf8')
+        out = open(self.path/'data'/'parsed'/'final.csv', 'w', encoding='utf8') # open file to final result
 
-        with open(self.path/'data'/'parsed'/'parsed.tsv', newline='') as csvfile:
-            rdr = csv.reader(csvfile, delimiter='\t')
+        with open(self.path/'data'/'parsed'/'parsed.tsv', newline='') as csvfile: # open parsed data
+            rdr = csv.reader(csvfile, delimiter='\t') # read data
             for row in rdr:
-                remote = row[0].replace('/thumb', '')
+                remote = row[0].replace('/thumb', '') # replace thumb files to sourse
                 remote = '/'.join(remote.split('/')[:-1])
                 url = "https:" + remote
-                filename = self.image_path / (str(self.idx) + "." + row[0].split('.')[-1])
+                filename = self.image_path / (str(self.idx) + "." + row[0].split('.')[-1]) # init unique path
                 print ("downloading image #" + str(self.idx) + "...")
                 
-                opener = urllib.request.build_opener()
-                opener.addheaders = [('User-agent', 'Smikler/89.0'), ('Api-User-Agent', 'Smikler/89.0')]
+                opener = urllib.request.build_opener() # build server for requests
+                opener.addheaders = [('User-agent', 'Smikler/89.0'), ('Api-User-Agent', 'Smikler/89.0')] # add User-Agent
                 urllib.request.install_opener(opener)
-                urllib.request.urlretrieve(url, filename)
+                urllib.request.urlretrieve(url, filename) # save file
                 
                 self.idx += 1
-                out.write(str(self.idx) + "," + row[1].replace(',', ';') + "," + row[2].replace(',', ';') + "\n")
+                out.write(str(self.idx) + "," + row[1].replace(',', ';') + "," + row[2].replace(',', ';') + "\n") # save ID of image and description
                 
         out.flush()
-        out.close()
-#idx = 0
-#path = pathlib.Path(__file__).parent.resolve()
+        out.close() # close file
 
 
